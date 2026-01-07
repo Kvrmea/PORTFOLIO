@@ -14,8 +14,34 @@ title: Portfolio - Jeu Interactif
   
   <!-- Écran titre -->
   <div id="title-screen">
-    <h1 class="game-title">Mon Portfolio en Jeu</h1>
+    <h1 class="game-title">Bienvenu sur mon Portfolio Interactif</h1>
+    <p class="game-subtitle">Explorez mes projets dans un univers pixel art</p>
     <button id="play-button" class="pixel-button">PLAY</button>
+  </div>
+  
+  <!-- HUD moderne -->
+  <div id="game-hud" class="hidden">
+    <div class="hud-left">
+      <div class="hud-card">
+        <div class="hud-title">Projets découverts</div>
+        <div class="hud-value">
+          <span id="projects-found">0</span> / 6
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+        </div>
+      </div>
+    </div>
+    <div class="hud-right">
+      <div class="hud-card">
+        <div class="hud-title">Contrôles</div>
+        <div class="hud-value" style="font-size: 0.8rem;">
+          ← → | Q D Déplacer<br>
+          ↑ / ESPACE Sauter<br>
+          E Interagir
+        </div>
+      </div>
+    </div>
   </div>
   
   <!-- Canvas du jeu -->
@@ -30,7 +56,7 @@ title: Portfolio - Jeu Interactif
   <div class="modal-content">
     <div class="modal-header">
       <h2 class="modal-title" id="modal-title">Projet</h2>
-      <button class="close-button" id="close-modal">X</button>
+      <button class="close-button" id="close-modal">✕</button>
     </div>
     <div class="modal-body" id="modal-body">
       <!-- Contenu dynamique -->

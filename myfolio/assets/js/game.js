@@ -98,6 +98,9 @@ function checkImagesLoaded() {
 }
 
 function startGame() {
+  const gameHud = document.getElementById('game-hud');
+  gameHud.classList.remove('hidden');
+
   // Créer le joueur
   player = new Player(100, 100);
   
@@ -606,10 +609,21 @@ function openSocialLink(platform) {
     }
 }
 
+function openProjectModal () {
+  gameRunning = false;
+  modalOpen = true;
+  document.getElementById('game-hud').classList.add('hidden');
+}
+
 function closeProjectModal() {
     const modal = document.getElementById('project-modal')
     modal.classList.add('hidden');
+
+    document.getElementById('game-hud').classList.remove('hidden');
+    
     gameRunning = true;
     modalOpen = false;
     lastTime = performance.now();
+
+    requestAnimationFrame(gameLoop);
 }
