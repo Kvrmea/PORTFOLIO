@@ -12,6 +12,8 @@ let platforms = [];
 let interactiveObjects = [];
 let lastTime = 0;
 let gameRunning = false;
+let currentInteractable = null;
+let modalOpen = false;
 
 // Images
 let playerImage;
@@ -425,36 +427,63 @@ function drawPlayer() {
 
 function checkInteractions() {
   const uiOverlay = document.getElementById('ui-overlay');
-  uiOverlay.innerHTML = ''; // Clear previous hints
-  
-  interactiveObjects.forEach(obj => {
+  uiOverlay.innerHTML = '';
+  currentInteractable = null;
+
+  for (const obj of interactiveObjects) {
     const distance = Math.hypot(
       (player.x + player.width / 2) - (obj.x + obj.width / 2),
       (player.y + player.height / 2) - (obj.y + obj.height / 2)
     );
-    
-    // Si le joueur est proche
+
     if (distance < 80) {
-      showInteractionHint(obj);
+      currentInteractable = obj;
+
+      const hint = document.createElement('div');
+      hint.className = 'interaction-hint';
+      hint.textContent = `Appuie sur E pour ${obj.title || obj.label || 'interagir'}`;
+      hint.style.left = `${obj.x}px`;
+      hint.style.top = `${obj.y - 40}px`;
+
+      uiOverlay.appendChild(hint);
+      break; // 🔥 UN SEUL OBJET À LA FOIS
     }
-  });
+  }
 }
 
-function showInteractionHint(obj) {
-  const uiOverlay = document.getElementById('ui-overlay');
+
+window.addEventListener('keydown', (e) => {
+  if (e.key.toLowerCase() === 'e') {
+
+    if (modalOpen) {
+        closeProjectModal();
+        return;
+    }
+    if (currentInteractable && gameRunning) {
+        handleInteraction(currentInteractable);
+    }
+  }
+});
+
+document.getElementById('close-modal')?.addEventListener('click', closeProjectModal);
+
+
+
+// function showInteractionHint(obj) {
+//   const uiOverlay = document.getElementById('ui-overlay');
   
-  const hint = document.createElement('div');
-  hint.className = 'interaction-hint';
-  hint.textContent = `Clic pour ${obj.title || obj.label || 'interagir'}`;
-  hint.style.left = `${obj.x}px`;
-  hint.style.top = `${obj.y - 40}px`;
+//   const hint = document.createElement('div');
+//   hint.className = 'interaction-hint';
+//   hint.textContent = `Clic pour ${obj.title || obj.label || 'interagir'}`;
+//   hint.style.left = `${obj.x}px`;
+//   hint.style.top = `${obj.y - 40}px`;
   
-  hint.addEventListener('click', () => {
-    handleInteraction(obj);
-  });
+//   hint.addEventListener('click', () => {
+//     handleInteraction(obj);
+//   });
   
-  uiOverlay.appendChild(hint);
-}
+//   uiOverlay.appendChild(hint);
+// }
 
 function handleInteraction(obj) {
   switch(obj.type) {
@@ -462,7 +491,7 @@ function handleInteraction(obj) {
       showProject(obj.projectId, obj.title);
       break;
     case 'npc':
-      window.location.href = '/about.html';
+      window.location.href = '/about/';
       break;
     case 'chest':
       openSocialLink(obj.link);
@@ -471,9 +500,116 @@ function handleInteraction(obj) {
 }
 
 function showProject(projectId, title) {
-  alert(`Affichage du projet ${projectId}: ${title}\n\nOn créera un modal stylé dans la prochaine étape !`);
+  const modal = document.getElementById('project-modal');
+  const modalTitle = document.getElementById('modal-title');
+  const modalBody = document.getElementById('modal-body');
+  
+  // Données des projets
+  const projects = {
+    1: {
+      title: "Projet 1 - Klivio",
+      description: "Un site de formation.",
+      technologies: ["HTML", "CSS"],
+      features: [
+        "Interface responsive",
+        "Identique à une maquette lors de mon projet en école",
+      ],
+      link: "https://kvrmea.github.io/klivio_EPITECH/"
+    },
+    2: {
+      title: "Projet 2 - Klivio.v2",
+      description: "Site de formation dynamque.",
+      technologies: ["HTML", "CSS", "Tailwind"],
+      features: [
+        "Site responsive et dynamque",
+        "Intégration de tailwind",
+        "Modération automatique"
+      ],
+      link: "https://kvrmea.github.io/klivio_tailwind/"
+    },
+    3: {
+      title: "Projet 3 - Portfolio Interactif en jeu",
+      description: "Ce portfolio que vous explorez actuellement !",
+      technologies: ["Jekyll", "JavaScript", "Canvas API"],
+      features: [
+        "Jeu platformer",
+        "Interactions dynamiques",
+        "Design pixel art"
+      ],
+      link: "#"
+    },
+    4: {
+      title: "Projet 4 - Système solaire 3D",
+      description: "Site d'une animation en 3D.",
+      technologies: ["HTML", "API", "JavaScript", "Three.js", "CSS"],
+      features: [
+        "3d three.js",
+        "fetch API",
+      ],
+      link: "#"
+    },
+    5: {
+      title: "Projet 5 - Site E-commerce",
+      description: "Plateforme e-commerce complète avec panier et paiement.",
+      technologies: ["Vue.js", "Stripe", "PostgreSQL"],
+      features: [
+        "Gestion de panier",
+        "Paiement sécurisé",
+        "Dashboard admin"
+      ],
+      link: "#"
+    },
+    6: {
+      title: "Projet 6 - IA & Machine Learning",
+      description: "Projet utilisant le machine learning pour la reconnaissance d'images.",
+      technologies: ["Python", "TensorFlow", "OpenCV"],
+      features: [
+        "Reconnaissance d'objets",
+        "Apprentissage automatique",
+        "API de prédiction"
+      ],
+      link: "#"
+    }
+  };
+  
+  const project = projects[projectId];
+  
+  modalTitle.textContent = project.title;
+  modalBody.innerHTML = `
+    <p>${project.description}</p>
+    
+    <h3>🛠️ Technologies utilisées</h3>
+    <ul>
+      ${project.technologies.map(tech => `<li>${tech}</li>`).join('')}
+    </ul>
+    
+    <h3>✨ Fonctionnalités principales</h3>
+    <ul>
+      ${project.features.map(feature => `<li>${feature}</li>`).join('')}
+    </ul>
+    
+    <a href="${project.link}" class="project-link" target="_blank">Voir le projet →</a>
+  `;
+  
+  modal.classList.remove('hidden');
+  gameRunning = false; // Pause le jeu
+  modalOpen = true;
 }
 
 function openSocialLink(platform) {
-  alert(`Redirection vers ${platform}\n\nOn ajoutera les vrais liens dans la prochaine étape !`);
+    const links = {
+        github: 'https://github.com/Kvrmea',
+        linkedin: 'https://www.linkedin.com/in/hugo-munoz03/'
+    };
+    if (links[platform]) {
+        window.open(links[platform], '_blank');
+    }
+}
+
+function closeProjectModal() {
+    const modal = document.getElementById('project-modal')
+    modal.classList.add('hidden');
+    gameRunning = true;
+    modalOpen = false;
+    lastTime = performance.now();
 }
