@@ -2,8 +2,8 @@ class Player {
   constructor(x, y) {
     this.x = x;
     this.y = y;
-    this.width = 48; // Taille approximative sprite
-    this.height = 48;
+    this.width = 100; // Taille approximative sprite
+    this.height = 58;
     this.velocityX = 0;
     this.velocityY = 0;
     this.speed = 5;
@@ -15,7 +15,7 @@ class Player {
     // Animation
     this.frameX = 0;
     this.frameY = 0;
-    this.maxFrames = 4; // À ajuster selon ton spritesheet
+    this.maxFrames = 4; // À ajuster selon spritesheet
     this.frameTimer = 0;
     this.frameInterval = 100; // ms entre chaque frame
     

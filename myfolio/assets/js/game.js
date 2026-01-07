@@ -132,54 +132,54 @@ function createInteractiveObjects() {
     { 
       type: 'sword', 
       x: 250, 
-      y: 500, 
-      width: 30, 
-      height: 40, 
+      y: 480, 
+      width: 50, 
+      height: 70, 
       projectId: 1,
       title: 'Projet 1'
     },
     { 
       type: 'sword', 
       x: 500, 
-      y: 300, 
-      width: 30, 
-      height: 40, 
+      y: 270, 
+      width: 50, 
+      height: 70, 
       projectId: 2,
       title: 'Projet 2'
     },
     { 
       type: 'sword', 
       x: 750, 
-      y: 200, 
-      width: 30, 
-      height: 40, 
+      y: 170, 
+      width: 50, 
+      height: 70, 
       projectId: 3,
       title: 'Projet 3'
     },
     { 
       type: 'sword', 
       x: 1000, 
-      y: 300, 
-      width: 30, 
-      height: 40, 
+      y: 270, 
+      width: 50, 
+      height: 70, 
       projectId: 4,
       title: 'Projet 4'
     },
     { 
       type: 'sword', 
       x: 550, 
-      y: 100, 
-      width: 30, 
-      height: 40, 
+      y: 80, 
+      width: 50, 
+      height: 70, 
       projectId: 5,
       title: 'Projet 5'
     },
     { 
       type: 'sword', 
       x: 100, 
-      y: 500, 
-      width: 30, 
-      height: 40, 
+      y: 480, 
+      width: 50, 
+      height: 70, 
       projectId: 6,
       title: 'Projet 6'
     },
@@ -188,9 +188,9 @@ function createInteractiveObjects() {
     { 
       type: 'npc', 
       x: 900, 
-      y: 490, 
-      width: 40, 
-      height: 60,
+      y: 470, 
+      width: 70, 
+      height: 90,
       label: 'À Propos'
     },
     
