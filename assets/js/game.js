@@ -70,7 +70,7 @@ function loadImages() {
     imagesLoaded++;
     checkImagesLoaded();
   };
-  playerImage.src = './assets/images/character/player.png';
+  playerImage.src = 'assets/images/character/player.png';
   
   // Charger l'image du PNJ
   npcImage = new Image();
@@ -83,7 +83,7 @@ function loadImages() {
     imagesLoaded++;
     checkImagesLoaded();
   };
-  npcImage.src = './assets/images/character/pnj-jeu.png';
+  npcImage.src = 'assets/images/character/pnj-jeu.png';
   
   // Charger l'image de l'épée
   swordImage = new Image();
@@ -96,7 +96,7 @@ function loadImages() {
     imagesLoaded++;
     checkImagesLoaded();
   };
-  swordImage.src = './assets/images/objects/sword.png';
+  swordImage.src = 'assets/images/objects/sword.png';
 }
 
 function checkImagesLoaded() {
