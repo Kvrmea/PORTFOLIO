@@ -4,6 +4,7 @@
 
 layout: default
 title: Portfolio - Jeu Interactif
+body_class: game-page
 ---
 
 <div id="game-container">

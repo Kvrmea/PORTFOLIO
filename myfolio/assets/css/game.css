@@ -13,7 +13,7 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 #game-container {
@@ -28,6 +28,11 @@ body {
     0 0 60px rgba(255, 107, 107, 0.3),
     0 20px 80px rgba(0, 0, 0, 0.8);
 }
+
+body.game-page {
+  overflow: hidden;
+}
+
 
 /* Background layers */
 .bg-layer {
@@ -193,6 +198,12 @@ body {
   image-rendering: pixelated;
   position: relative;
   z-index: 5;
+  transform: scale(1.05);
+  transition: transform 1.2s ease;
+}
+
+#gameCanvas.zoomed {
+  transform: scale(1);
 }
 
 /* HUD */
@@ -207,6 +218,14 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  opacity: 0;
+  transform: translateY(-10px) scale(0.98);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+#game-hud.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
 }
 
 .hud-left, .hud-right {

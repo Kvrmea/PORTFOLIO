@@ -14,6 +14,8 @@ let lastTime = 0;
 let gameRunning = false;
 let currentInteractable = null;
 let modalOpen = false;
+let projectsFound = 0;
+let totalProjects = 6;
 
 // Images
 let playerImage;
@@ -100,6 +102,14 @@ function checkImagesLoaded() {
 function startGame() {
   const gameHud = document.getElementById('game-hud');
   gameHud.classList.remove('hidden');
+  requestAnimationFrame(() => {
+    gameHud.classList.add("visible")
+  });
+
+  const canvas = document.getElementById("gameCanvas");
+  requestAnimationFrame(() => {
+    canvas.classList.add("zoomded");
+  });
 
   // Créer le joueur
   player = new Player(100, 100);
@@ -141,7 +151,8 @@ function createInteractiveObjects() {
       width: 50, 
       height: 70, 
       projectId: 1,
-      title: 'Projet 1'
+      title: 'Projet 1',
+      discovered: false 
     },
     { 
       type: 'sword', 
@@ -150,7 +161,8 @@ function createInteractiveObjects() {
       width: 50, 
       height: 70, 
       projectId: 2,
-      title: 'Projet 2'
+      title: 'Projet 2',
+      discovered: false 
     },
     { 
       type: 'sword', 
@@ -159,7 +171,8 @@ function createInteractiveObjects() {
       width: 50, 
       height: 70, 
       projectId: 3,
-      title: 'Projet 3'
+      title: 'Projet 3',
+      discovered: false 
     },
     { 
       type: 'sword', 
@@ -168,7 +181,8 @@ function createInteractiveObjects() {
       width: 50, 
       height: 70, 
       projectId: 4,
-      title: 'Projet 4'
+      title: 'Projet 4',
+      discovered: false 
     },
     { 
       type: 'sword', 
@@ -177,7 +191,8 @@ function createInteractiveObjects() {
       width: 50, 
       height: 70, 
       projectId: 5,
-      title: 'Projet 5'
+      title: 'Projet 5',
+      discovered: false 
     },
     { 
       type: 'sword', 
@@ -186,7 +201,8 @@ function createInteractiveObjects() {
       width: 50, 
       height: 70, 
       projectId: 6,
-      title: 'Projet 6'
+      title: 'Projet 6',
+      discovered: false 
     },
     
     // PNJ pour "À propos"
@@ -491,6 +507,12 @@ document.getElementById('close-modal')?.addEventListener('click', closeProjectMo
 function handleInteraction(obj) {
   switch(obj.type) {
     case 'sword':
+      // Marquer comme découvert et incrémenter
+      if (!obj.discovered) {
+        obj.discovered = true;
+        projectsFound++;
+        updateProjectsUI();
+      }
       showProject(obj.projectId, obj.title);
       break;
     case 'npc':
@@ -595,8 +617,9 @@ function showProject(projectId, title) {
   `;
   
   modal.classList.remove('hidden');
-  gameRunning = false; // Pause le jeu
-  modalOpen = true;
+  // gameRunning = false; // Pause le jeu
+  // modalOpen = true;
+  openProjectModal();
 }
 
 function openSocialLink(platform) {
@@ -626,4 +649,13 @@ function closeProjectModal() {
     lastTime = performance.now();
 
     requestAnimationFrame(gameLoop);
+}
+
+function updateProjectsUI() {
+  const countEl = document.getElementById("projects-found");
+  const fillEl = document.getElementById("progress-fill");
+
+  countEl.textContent = projectsFound;
+  const percent = (projectsFound / totalProjects) * 100;
+  fillEl.style.width = percent + "%";
 }

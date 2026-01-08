@@ -11,18 +11,22 @@ title: À Propos de Moi
   
   <div class="about-content">
     <section class="about-section">
-      <h2>👋 Biographie</h2>
+      <h2>👋 Développeur Full Stack en formation | Explorateur d’IA & Design</h2>
       <p>
-        Salut ! Je suis un développeur full-stack passionné par l'IA et les technologies innovantes. 
-        J'adore créer des expériences interactives et apprendre de nouvelles choses chaque jour.
+          Welcome nouveaux Joueur 👋!<br>
+          Dans cet univers de code et de lave, je forge des applications Full Stack robustes en transformant chaque ligne de commande en expérience interactive. Actuellement en pleine ascension, je ne laisse aucune place à l'inertie : pour moi, chaque projet est un boss final que je combats avec passion et détermination.
+
+          Ma conviction ? L'intelligence artificielle est l'avenir, et je l'intègre au cœur de ma forge technique. Alliant la rigueur du back-end à une sensibilité UI/UX aiguisée, je relève chaque défi avec une sainte horreur de la procrastination.
+
+          J'apprends, je teste et j'innove chaque jour dans le feu de l'innovation pour bâtir le web de demain. Prêt à voir ce que nous pouvons construire ensemble ?
       </p>
     </section>
     
     <section class="about-section">
       <h2>🎓 Mon Parcours</h2>
       <ul>
-        <li><strong>2024-2025</strong> : Formation Développement Full-Stack</li>
-        <li><strong>2023</strong> : Découverte de la programmation</li>
+        <li><strong>2025-2026</strong> : Formation Développement Full-Stack / Web@cademie by EPITECH</li>
+        <li><strong>2022</strong> : Découverte de la programmation</li>
         <li><strong>Projets</strong> : 6+ projets web et IA</li>
       </ul>
     </section>
@@ -32,9 +36,9 @@ title: À Propos de Moi
       <div class="tools-grid">
         <div class="tool-card">JavaScript</div>
         <div class="tool-card">Python</div>
-        <div class="tool-card">React</div>
+        <div class="tool-card">Three.js</div>
         <div class="tool-card">Node.js</div>
-        <div class="tool-card">MongoDB</div>
+        <div class="tool-card">PHP</div>
         <div class="tool-card">Git</div>
         <div class="tool-card">HTML/CSS</div>
         <div class="tool-card">IA/ML</div>
