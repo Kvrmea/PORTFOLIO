@@ -577,7 +577,7 @@ function handleInteraction(obj) {
       break;
     case 'npc':
       const basePath = window.siteBaseUrl || '';
-      window.location.href = basePath + '/about/';
+      window.location.href = basePath + '/about';
       break;
     case 'chest':
       openSocialLink(obj.link);
