@@ -16,6 +16,7 @@ let currentInteractable = null;
 let modalOpen = false;
 let projectsFound = 0;
 let totalProjects = 6;
+let lastInteractable = null;
 
 // Images
 let playerImage;
@@ -36,6 +37,11 @@ function setupPlayButton() {
   
   playButton.addEventListener('click', () => {
     titleScreen.classList.add('hidden');
+
+    titleScreen.addEventListener('animationend', () => {
+      titleScreen.classList.add('removed');
+    }, {once: true});
+
     startGame();
   });
 }
@@ -100,6 +106,9 @@ function checkImagesLoaded() {
 }
 
 function startGame() {
+  gameRunning = true;
+  lastTime = performance.now();
+
   const gameHud = document.getElementById('game-hud');
   gameHud.classList.remove('hidden');
   requestAnimationFrame(() => {
@@ -446,8 +455,9 @@ function drawPlayer() {
 
 function checkInteractions() {
   const uiOverlay = document.getElementById('ui-overlay');
-  uiOverlay.innerHTML = '';
-  currentInteractable = null;
+
+  let nearestNPC = null;
+  let nearestOther = null;
 
   for (const obj of interactiveObjects) {
     const distance = Math.hypot(
@@ -455,21 +465,69 @@ function checkInteractions() {
       (player.y + player.height / 2) - (obj.y + obj.height / 2)
     );
 
-    if (distance < 80) {
-      currentInteractable = obj;
-
-      const hint = document.createElement('div');
-      hint.className = 'interaction-hint';
-      hint.textContent = `Appuie sur E pour ${obj.title || obj.label || 'interagir'}`;
-      hint.style.left = `${obj.x}px`;
-      hint.style.top = `${obj.y - 40}px`;
-
-      uiOverlay.appendChild(hint);
-      break; // 🔥 UN SEUL OBJET À LA FOIS
+    if (distance < 90) {
+      if (obj.type === 'npc') {
+        nearestNPC = obj;
+        break;
+      } else if (!nearestOther) {
+        nearestOther = obj;
+      }
     }
   }
-}
 
+  const target = nearestNPC || nearestOther;
+
+  // SI RIEN À INTERAGIR
+  if (!target) {
+    uiOverlay.innerHTML = '';
+    currentInteractable = null;
+    lastInteractable = null;
+    return;
+  }
+
+  // SI C’EST LE MÊME OBJET → ON NE REDESSINE PAS
+  if (target === lastInteractable) {
+    currentInteractable = target;
+    return;
+  }
+
+  // NOUVEL OBJET → ON REDESSINE
+  uiOverlay.innerHTML = '';
+  currentInteractable = target;
+  lastInteractable = target;
+
+  // BULLE PNJ
+  if (target.type === 'npc') {
+    const bubble = document.createElement('div');
+    bubble.className = 'npc-dialogue';
+    bubble.innerHTML = `
+      <strong>Hugo :</strong><br>
+      Bienvenue dans mon univers.<br>
+      Je m'appelle Hugo, et si tu veux en découvrir plus,<br>
+      appuie sur <strong>E</strong>.
+    `;
+
+    bubble.style.left = `${target.x - 80}px`;
+    bubble.style.top = `${target.y - 90}px`;
+
+    uiOverlay.appendChild(bubble);
+  } else {
+    const hint = document.createElement('div');
+    hint.className = 'interaction-hint';
+
+    if (target.type === 'chest') {
+      hint.textContent = `🔗 ${target.label}`;
+      hint.classList.add(`hint-${target.link}`); 
+    }else {
+      hint.textContent = `Appuie sur E pour ${target.title || target.label || 'interagir'}`;
+    }
+    
+    hint.style.left = `${target.x}px`;
+    hint.style.top = `${target.y - 40}px`;
+
+    uiOverlay.appendChild(hint);
+  }
+}
 
 window.addEventListener('keydown', (e) => {
   if (e.key.toLowerCase() === 'e') {
