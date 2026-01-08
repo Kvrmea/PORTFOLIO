@@ -1,6 +1,7 @@
 ---
 layout: default
 title: À Propos de Moi
+permalink: /about/
 ---
 
 <div class="about-container">
