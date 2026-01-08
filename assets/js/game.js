@@ -60,7 +60,7 @@ function initGame() {
 }
 
 function loadImages() {
-  const basePath = document.querySelector('script[src*="game.js"]')?.src.replace('/assets/js/game.js', '') || '';
+  const basePath = window.siteBaseUrl || '';
 
   playerImage = new Image();
   playerImage.onload = () => {
@@ -576,7 +576,8 @@ function handleInteraction(obj) {
       showProject(obj.projectId, obj.title);
       break;
     case 'npc':
-      window.location.href = '/about/';
+      const basePath = window.siteBaseUrl || '';
+      window.location.href = basePath + '/about/';
       break;
     case 'chest':
       openSocialLink(obj.link);

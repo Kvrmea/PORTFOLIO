@@ -65,5 +65,9 @@ body_class: game-page
   </div>
 </div>
 
+<script>
+  window.siteBaseUrl = "{{ site.baseurl }}";
+</script>
+
 <script src="{{ '/assets/js/player.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/game.js' | relative_url }}"></script>
