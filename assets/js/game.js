@@ -70,7 +70,7 @@ function loadImages() {
     imagesLoaded++;
     checkImagesLoaded();
   };
-  playerImage.src = '/assets/images/character/player.png';
+  playerImage.src = './assets/images/character/player.png';
   
   // Charger l'image du PNJ
   npcImage = new Image();
@@ -96,7 +96,7 @@ function loadImages() {
     imagesLoaded++;
     checkImagesLoaded();
   };
-  swordImage.src = '/assets/images/objects/sword.png';
+  swordImage.src = '../assets/images/objects/sword.png';
 }
 
 function checkImagesLoaded() {
@@ -619,7 +619,7 @@ function showProject(projectId, title) {
         "Interactions dynamiques",
         "Design pixel art"
       ],
-      link: "#"
+      link: "https://kvrmea.github.io/PORTFOLIO/"
     },
     4: {
       title: "Projet 4 - Système solaire 3D",
