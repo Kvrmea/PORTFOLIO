@@ -11,6 +11,7 @@ class Player {
     this.gravity = 0.5;
     this.isGrounded = false;
     this.direction = 1; // 1 = droite, -1 = gauche
+    this.inputEnabled = true;
     
     // Animation
     this.frameX = 0;
@@ -35,7 +36,7 @@ class Player {
       switch(e.code) {
         case 'ArrowLeft':
         case 'KeyA':
-        case 'KeyQ': // AZERTY
+        case 'KeyQ':
           this.keys.left = true;
           break;
         case 'ArrowRight':
@@ -44,13 +45,13 @@ class Player {
           break;
         case 'ArrowUp':
         case 'KeyW':
-        case 'KeyZ': // AZERTY
+        case 'KeyZ':
         case 'Space':
           this.keys.up = true;
           break;
       }
     });
-    
+
     window.addEventListener('keyup', (e) => {
       switch(e.code) {
         case 'ArrowLeft':
@@ -73,6 +74,10 @@ class Player {
   }
   
   update(deltaTime, platforms) {
+    if (!this.inputEnabled) {
+      this.velocityX = 0;
+      return;
+    }
     // Déplacement horizontal
     if (this.keys.left) {
       this.velocityX = -this.speed;

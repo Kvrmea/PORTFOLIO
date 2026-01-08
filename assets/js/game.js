@@ -8,6 +8,7 @@ const CONFIG = {
 // Variables globales
 let canvas, ctx;
 let player;
+let onboardingActive = false;
 let platforms = [];
 let interactiveObjects = [];
 let lastTime = 0;
@@ -17,6 +18,15 @@ let modalOpen = false;
 let projectsFound = 0;
 let totalProjects = 6;
 let lastInteractable = null;
+
+// --- SYSTÈME DE CAMÉRA ---
+let camera = {
+  x: 0,
+  y: 0,
+  target: null,
+  isAnimating: false,
+  lerpFactor: 0.05
+};
 
 // Images
 let playerImage;
@@ -107,6 +117,22 @@ function checkImagesLoaded() {
   }
 }
 
+function triggerOnboarding() {
+  const npc = interactiveObjects.find(obj => obj.type === 'npc');
+  if (!npc) return;
+
+  onboardingActive = true;
+  camera.target = npc;
+
+  const arrow = document.getElementById('onboarding-arrow');
+  if (arrow) arrow.classList.remove('hidden');
+
+  setTimeout(() => {
+    onboardingActive = false;
+    if (arrow) arrow.classList.add('hidden');
+  }, 3500);
+}
+
 function startGame() {
   gameRunning = true;
   lastTime = performance.now();
@@ -124,13 +150,57 @@ function startGame() {
 
   // Créer le joueur
   player = new Player(100, 100);
+  player.inputEnabled = false;
   
   // Créer les plateformes
   createPlatforms();
   
   // Créer les objets interactifs (épées, PNJ, etc.)
   createInteractiveObjects();
-  
+
+ // Onboarding
+  const onboarding = document.getElementById('onboarding');
+  const arrow = document.getElementById('onboarding-arrow');
+
+  player.inputEnabled = false;
+  onboardingActive = true;
+
+  // Récupère le PNJ
+  const npc = interactiveObjects.find(o => o.type === 'npc');
+
+  // ÉTAPE 1 – caméra vers PNJ
+  onboarding.textContent = "Voici Hugo. Il peut te parler.";
+  onboarding.classList.remove('hidden');
+  requestAnimationFrame(() => onboarding.classList.add('visible'));
+
+  cameraTargetX = npc.x - 400;
+
+  // ÉTAPE 2 – flèche + message
+  setTimeout(() => {
+    onboarding.textContent = "Approche-toi et appuie sur E";
+
+    arrow.classList.remove('hidden');
+    arrow.style.left = `${npc.x + npc.width / 2}px`;
+    arrow.style.top = `${npc.y - 40}px`;
+  }, 3000);
+
+  // FIN
+  const endOnboarding = () => {
+    onboarding.classList.remove('visible');
+    arrow.classList.add('hidden');
+
+    setTimeout(() => {
+      onboarding.classList.add('hidden');
+      onboardingActive = false;
+      player.inputEnabled = true;
+      cameraTargetX = player.x - 400;
+    }, 400);
+
+    window.removeEventListener('keydown', endOnboarding);
+  };
+
+  window.addEventListener('keydown', endOnboarding);
+
   // Démarrer la boucle de jeu
   gameRunning = true;
   requestAnimationFrame(gameLoop);
@@ -250,28 +320,72 @@ function createInteractiveObjects() {
 
 function gameLoop(timestamp) {
   if (!gameRunning) return;
-  
-  // Calculer le delta time
   const deltaTime = timestamp - lastTime;
   lastTime = timestamp;
+
+  // 1. Cible de la caméra
+  if (!onboardingActive && player) {
+    camera.target = player;
+  }
+
+  if (camera.target) {
+    const targetX = camera.target.x - (canvas.width / 2) + (camera.target.width / 2 || 0);
+    camera.x += (targetX - camera.x) * camera.lerpFactor;
+  }
+
   
-  // Clear canvas
-  ctx.fillStyle = CONFIG.backgroundColor;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  if (onboardingActive) {
+    const npc = interactiveObjects.find(obj => obj.type === 'npc');
+    const arrow = document.getElementById('onboarding-arrow');
+    if (npc && arrow) {
+      const screenX = npc.x - camera.x + (npc.width / 2);
+      arrow.style.left = `${screenX}px`;
+      arrow.style.top = `${npc.y - 60}px`;
+    }
+  }
+
+  // 3. Rendu
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.save();
+  ctx.translate(-camera.x, 0);
   
-  // Update
   player.update(deltaTime, platforms);
-  
-  // Draw
   drawPlatforms();
   drawInteractiveObjects();
   drawPlayer();
   
-  // Check interactions
+  ctx.restore();
   checkInteractions();
-  
-  // Continue la boucle
   requestAnimationFrame(gameLoop);
+}
+
+// function showOnboarding() {
+//   const onboarding = document.getElementById('onboarding');
+
+//   onboarding.classList.remove('hidden');
+//   requestAnimationFrame(() => onboarding.classList.add('visible'));
+
+//   // Désactiver le joueur temporairement
+//   // player.canMove = false;
+
+//   setTimeout(() => {
+//     onboarding.classList.remove('visible');
+
+//     setTimeout(() => {
+//       onboarding.classList.add('hidden');
+//       onboardingActive = false;
+//       player.canMove = true;
+//     }, 400);
+//   }, 3000);
+// }
+
+function endOnboarding() {
+  onboardingActive = false;
+
+  const onboarding = document.getElementById('onboarding');
+  onboarding.classList.add('hidden');
+
+  player.inputEnabled = true;
 }
 
 function drawPlatforms() {

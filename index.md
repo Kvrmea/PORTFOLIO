@@ -47,9 +47,22 @@ body_class: game-page
   
   <!-- Canvas du jeu -->
   <canvas id="gameCanvas"></canvas>
+
+  <!-- Onboarding -->
+  <div id="onboarding" class="onboarding hidden">
+    <p>
+      ← → ou Q D pour te déplacer<br>
+      ↑ ou ESPACE pour sauter<br>
+      <strong>E</strong> pour interagir
+    </p>
+  </div>
+    
   
   <!-- UI overlay pour les interactions -->
   <div id="ui-overlay"></div>
+
+  <div id="onboarding-arrow" class="onboarding-arrow hidden">⬇</div>
+
 </div>
 
 <!-- Modal pour les projets -->
