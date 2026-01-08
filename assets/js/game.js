@@ -60,6 +60,8 @@ function initGame() {
 }
 
 function loadImages() {
+  const basePath = document.querySelector('script[src*="game.js"]')?.src.replace('/assets/js/game.js', '') || '';
+
   playerImage = new Image();
   playerImage.onload = () => {
     imagesLoaded++;
@@ -70,7 +72,7 @@ function loadImages() {
     imagesLoaded++;
     checkImagesLoaded();
   };
-  playerImage.src = './assets/images/character/player.png';
+  playerImage.src = basePath + '/assets/images/character/player.png';
   
   // Charger l'image du PNJ
   npcImage = new Image();
@@ -83,7 +85,7 @@ function loadImages() {
     imagesLoaded++;
     checkImagesLoaded();
   };
-  npcImage.src = '/assets/images/character/pnj-jeu.png';
+  npcImage.src = basePath + '/assets/images/character/pnj-jeu.png';
   
   // Charger l'image de l'épée
   swordImage = new Image();
@@ -96,7 +98,7 @@ function loadImages() {
     imagesLoaded++;
     checkImagesLoaded();
   };
-  swordImage.src = '../assets/images/objects/sword.png';
+  swordImage.src = basePath + '/assets/images/objects/sword.png';
 }
 
 function checkImagesLoaded() {
