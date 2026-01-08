@@ -7,7 +7,7 @@ permalink: /about/
 <div class="about-container">
   <div class="about-header">
     <h1 class="about-title">À Propos de Moi</h1>
-    <a href="/" class="back-button">← Retour au jeu</a>
+    <a href="{{ '/' | relative_url }}" class="back-button">← Retour au jeu</a>
   </div>
   
   <div class="about-content">
