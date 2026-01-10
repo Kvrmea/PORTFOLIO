@@ -117,22 +117,6 @@ function checkImagesLoaded() {
   }
 }
 
-function triggerOnboarding() {
-  const npc = interactiveObjects.find(obj => obj.type === 'npc');
-  if (!npc) return;
-
-  onboardingActive = true;
-  camera.target = npc;
-
-  const arrow = document.getElementById('onboarding-arrow');
-  if (arrow) arrow.classList.remove('hidden');
-
-  setTimeout(() => {
-    onboardingActive = false;
-    if (arrow) arrow.classList.add('hidden');
-  }, 3500);
-}
-
 function worldToScreen(x, y) {
     const rect = canvas.getBoundingClientRect();
     return {
@@ -166,45 +150,35 @@ function startGame() {
   // Créer les objets interactifs (épées, PNJ, etc.)
   createInteractiveObjects();
 
- // Onboarding
+  // --- ONBOARDING ---
   const onboarding = document.getElementById('onboarding');
-  const arrow = document.getElementById('onboarding-arrow');
-
   player.inputEnabled = false;
   onboardingActive = true;
 
-  // Récupère le PNJ
   const npc = interactiveObjects.find(o => o.type === 'npc');
 
-  // ÉTAPE 1 – caméra vers PNJ
-  onboarding.textContent = "Voici Hugo. Il peut te parler.";
+  // ÉTAPE 1 – caméra sur le PNJ
+  onboarding.textContent = "Voici Hugo. C’est moi.";
   onboarding.classList.remove('hidden');
   requestAnimationFrame(() => onboarding.classList.add('visible'));
 
-  cameraTargetX = npc.x - 400;
-
-  // ÉTAPE 2 – flèche + message
   setTimeout(() => {
-    onboarding.textContent = "Approche-toi et appuie sur E";
-
-    arrow.classList.remove('hidden');
-    arrow.style.left = `${npc.x + npc.width / 2}px`;
-    arrow.style.top = `${npc.y - 40}px`;
+    onboarding.textContent = "Quand tu veux commencer, utilise une touche de déplacement et va voir Hugo.";
   }, 3000);
 
-  // FIN
-  const endOnboarding = () => {
-    onboarding.classList.remove('visible');
-    arrow.classList.add('hidden');
+  // FIN onboarding → dès que le joueur bouge
+  const endOnboarding = (e) => {
+    if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "q", "d", "z", "s"].includes(e.key.toLowerCase())) {
+      onboarding.classList.remove('visible');
 
-    setTimeout(() => {
-      onboarding.classList.add('hidden');
-      onboardingActive = false;
-      player.inputEnabled = true;
-      cameraTargetX = player.x - 400;
-    }, 400);
+      setTimeout(() => {
+        onboarding.classList.add('hidden');
+        onboardingActive = false;
+        player.inputEnabled = true;
+      }, 400);
 
-    window.removeEventListener('keydown', endOnboarding);
+      window.removeEventListener('keydown', endOnboarding);
+    }
   };
 
   window.addEventListener('keydown', endOnboarding);
@@ -342,22 +316,6 @@ function gameLoop(timestamp) {
   if (target) {
     const targetX = target.x - canvas.width / 2 + target.width / 2;
     camera.x += (targetX - camera.x) * camera.lerpFactor;
-  }
-
-  // Flèche onboarding
-  if (onboardingActive) {
-    const npc = interactiveObjects.find(obj => obj.type === 'npc');
-    const arrow = document.getElementById('onboarding-arrow');
-
-    if (npc && arrow) {
-      const pos = worldToScreen(
-        npc.x + npc.width / 2,
-        npc.y - 80
-      );
-
-      arrow.style.left = `${pos.x}px`;
-      arrow.style.top = `${pos.y}px`;
-    }
   }
 
   // 3. Rendu
@@ -601,7 +559,7 @@ function showLockedNpcMessage() {
   msg.className = 'npc-dialogue locked';
   msg.innerHTML = `
     <strong>Hugo :</strong><br>
-    Découvre tous mes projets, et reviens me voir pour en savoir plus.<br>
+    Découvre tous mes projets, et reviens me voir pour accèder à mon about me.<br>
     Progression : <strong>${projectsFound}/${totalProjects}</strong>
   `;
 

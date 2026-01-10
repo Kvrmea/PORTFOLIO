@@ -60,9 +60,6 @@ body_class: game-page
   
   <!-- UI overlay pour les interactions -->
   <div id="ui-overlay"></div>
-
-  <div id="onboarding-arrow" class="onboarding-arrow hidden">⬇</div>
-
 </div>
 
 <!-- Modal pour les projets -->
