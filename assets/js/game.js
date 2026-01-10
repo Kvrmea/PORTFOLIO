@@ -133,6 +133,14 @@ function triggerOnboarding() {
   }, 3500);
 }
 
+function worldToScreen(x, y) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: x - camera.x + rect.left,
+      y: y - camera.y + rect.top
+    };
+}
+
 function startGame() {
   gameRunning = true;
   lastTime = performance.now();
@@ -323,24 +331,32 @@ function gameLoop(timestamp) {
   const deltaTime = timestamp - lastTime;
   lastTime = timestamp;
 
-  // 1. Cible de la caméra
-  if (!onboardingActive && player) {
-    camera.target = player;
-  }
-
-  if (camera.target) {
-    const targetX = camera.target.x - (canvas.width / 2) + (camera.target.width / 2 || 0);
-    camera.x += (targetX - camera.x) * camera.lerpFactor;
-  }
-
+  // Caméra (joueur/PNJ)
+  let target = player;
   
   if (onboardingActive) {
     const npc = interactiveObjects.find(obj => obj.type === 'npc');
+    if (npc) target = npc;
+  }
+
+  if (target) {
+    const targetX = target.x - canvas.width / 2 + target.width / 2;
+    camera.x += (targetX - camera.x) * camera.lerpFactor;
+  }
+
+  // Flèche onboarding
+  if (onboardingActive) {
+    const npc = interactiveObjects.find(obj => obj.type === 'npc');
     const arrow = document.getElementById('onboarding-arrow');
+
     if (npc && arrow) {
-      const screenX = npc.x - camera.x + (npc.width / 2);
-      arrow.style.left = `${screenX}px`;
-      arrow.style.top = `${npc.y - 60}px`;
+      const pos = worldToScreen(
+        npc.x + npc.width / 2,
+        npc.y - 80
+      );
+
+      arrow.style.left = `${pos.x}px`;
+      arrow.style.top = `${pos.y}px`;
     }
   }
 
@@ -569,6 +585,28 @@ function drawPlayer() {
   }
 }
 
+function showLockedNpcMessage() {
+  const uiOverlay = document.getElementById('ui-overlay');
+  uiOverlay.innerHTML = '';
+
+
+  const msg = document.createElement('div');
+  msg.className = 'npc-dialogue locked';
+  msg.innerHTML = `
+    <strong>Hugo :</strong><br>
+    Découvre tous mes projets, et reviens me voir pour en savoir plus.<br>
+    Progression : <strong>${projectsFound}/${totalProjects}</strong>
+  `;
+
+  uiOverlay.appendChild(msg);
+
+  // Auto-disparition
+  setTimeout(() => {
+    msg.remove();
+  }, 2000);
+}
+
+
 function checkInteractions() {
   const uiOverlay = document.getElementById('ui-overlay');
 
@@ -690,6 +728,12 @@ function handleInteraction(obj) {
       showProject(obj.projectId, obj.title);
       break;
     case 'npc':
+      // PNJ Vérrouiller tant que les projets non pas été découverts
+      if (projectsFound < totalProjects) {
+        showLockedNpcMessage();
+        return;
+      }
+
       const basePath = window.siteBaseUrl || '';
       window.location.href = basePath + '/about/';
       break;
