@@ -589,6 +589,13 @@ function showLockedNpcMessage() {
   const uiOverlay = document.getElementById('ui-overlay');
   uiOverlay.innerHTML = '';
 
+  const npc = interactiveObjects.find(obj => obj.type === 'npc');
+  if (!npc) return;
+
+  const pos = worldToScreen(
+    npc.x + npc.width / 2,
+    npc.y - 110
+  );
 
   const msg = document.createElement('div');
   msg.className = 'npc-dialogue locked';
@@ -598,12 +605,16 @@ function showLockedNpcMessage() {
     Progression : <strong>${projectsFound}/${totalProjects}</strong>
   `;
 
+  msg.style.left = `${pos.x}px`;
+  msg.style.top = `${pos.y}px`;
+  msg.style.transform = 'translateX(-50%)';
+
   uiOverlay.appendChild(msg);
 
   // Auto-disparition
   setTimeout(() => {
     msg.remove();
-  }, 2000);
+  }, 5000);
 }
 
 
