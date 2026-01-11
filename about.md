@@ -26,7 +26,7 @@ permalink: /about/
     <section class="about-section">
       <h2>🎓 Mon Parcours</h2>
       <ul>
-        <li><strong>2025-2026</strong> : Formation Développement Full-Stack / Web@cademie by EPITECH</li>
+        <li><strong>2025-2026</strong> : Formation Développement Full-Stack RNCP niv 6 / Web@cademie by EPITECH</li>
         <li><strong>2022</strong> : Découverte de la programmation</li>
         <li><strong>Projets</strong> : 6+ projets web et IA</li>
       </ul>
