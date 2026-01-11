@@ -15,7 +15,7 @@ permalink: /about/
       <h2>👋 Développeur Full Stack en formation | Explorateur d’IA & Design</h2>
       <p>
           Welcome nouveaux Joueur 👋!<br>
-          Dans cet univers de code et de lave, je forge des applications Full Stack robustes en transformant chaque ligne de commande en expérience interactive. Actuellement en pleine ascension, je ne laisse aucune place à l'inertie : pour moi, chaque projet est un boss final que je combats avec passion et détermination.
+          Dans cet univers de code et néon, je forge des applications Full Stack robustes en transformant chaque ligne de commande en expérience interactive. Actuellement en pleine ascension, je ne laisse aucune place à l'inertie : pour moi, chaque projet est un boss final que je combats avec passion et détermination.
 
           Ma conviction ? L'intelligence artificielle est l'avenir, et je l'intègre au cœur de ma forge technique. Alliant la rigueur du back-end à une sensibilité UI/UX aiguisée, je relève chaque défi avec une sainte horreur de la procrastination.
 
@@ -46,4 +46,34 @@ permalink: /about/
       </div>
     </section>
   </div>
+
+  <section class="about-section">
+      <h2>📩 Me Contacter</h2>
+      <div class="contact-container">
+        <form action="https://formspree.io/f/ymunoz.0903@gmail.com" method="POST" class="contact-form">
+          <div class="form-group">
+            <input type="text" name="name" placeholder="Ton Nom" required>
+          </div>
+          <div class="form-group">
+            <input type="email" name="_replyto" placeholder="Ton Email" required>
+          </div>
+          <div class="form-group">
+            <textarea name="message" placeholder="Ton message..." rows="5" required></textarea>
+          </div>
+          <button type="submit" class="pixel-button">Envoyer le message</button>
+        </form>
+
+        <div class="social-links">
+          <a href="https://github.com/Kvrmea" target="_blank" class="tool-card">
+            <span>GitHub</span>
+          </a>
+          <a href="https://www.linkedin.com/in/hugo-munoz03/" target="_blank" class="tool-card">
+            <span>LinkedIn</span>
+          </a>
+          <a href="mailto:ymunoz.0903@gmail.com" class="tool-card">
+            <span>Email Direct</span>
+          </a>
+        </div>
+      </div>
+    </section>
 </div>

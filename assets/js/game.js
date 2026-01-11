@@ -19,6 +19,7 @@ let projectsFound = 0;
 let totalProjects = 6;
 let lastInteractable = null;
 let npcUnlocked = false;
+let cameraShakeEnabled = true;
 
 // Shake caméra
 let cameraShake = {
@@ -223,7 +224,8 @@ function createInteractiveObjects() {
       projectId: 1,
       title: 'Projet 1',
       discovered: false,
-      alpha: 1
+      alpha: 1,
+      removing: false
     },
     { 
       type: 'sword', 
@@ -234,7 +236,8 @@ function createInteractiveObjects() {
       projectId: 2,
       title: 'Projet 2',
       discovered: false,
-      alpha: 1
+      alpha: 1,
+      removing: false
     },
     { 
       type: 'sword', 
@@ -245,7 +248,8 @@ function createInteractiveObjects() {
       projectId: 3,
       title: 'Projet 3',
       discovered: false,
-      alpha: 1
+      alpha: 1,
+      removing: false
     },
     { 
       type: 'sword', 
@@ -256,7 +260,8 @@ function createInteractiveObjects() {
       projectId: 4,
       title: 'Projet 4',
       discovered: false,
-      alpha: 1 
+      alpha: 1,
+      removing: false
     },
     { 
       type: 'sword', 
@@ -267,7 +272,8 @@ function createInteractiveObjects() {
       projectId: 5,
       title: 'Projet 5',
       discovered: false,
-      alpha: 1 
+      alpha: 1,
+      removing: false 
     },
     { 
       type: 'sword', 
@@ -278,7 +284,8 @@ function createInteractiveObjects() {
       projectId: 6,
       title: 'Projet 6',
       discovered: false,
-      alpha: 1 
+      alpha: 1,
+      removing: false
     },
     
     // PNJ pour "À propos"
@@ -288,7 +295,8 @@ function createInteractiveObjects() {
       y: 470, 
       width: 70, 
       height: 90,
-      label: 'À Propos'
+      label: 'À Propos',
+      glowIntensity: 0
     },
     
     // Coffres pour réseaux sociaux
@@ -331,6 +339,16 @@ function gameLoop(timestamp) {
     camera.x += (targetX - camera.x) * camera.lerpFactor;
   }
 
+  document.querySelector('.bg-layer-1').style.transform =
+  `translateX(${-camera.x * 0.2}px)`;
+
+  document.querySelector('.bg-layer-2').style.transform =
+  `translateX(${-camera.x * 0.1}px)`;
+
+  document.querySelector('.bg-layer-3').style.transform =
+  `translateX(${-camera.x * 0.05}px)`;
+
+
   // 3. Rendu
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.save();
@@ -357,6 +375,8 @@ function gameLoop(timestamp) {
 }
 
 function triggerCameraShake(intensity = 8, duration = 15) {
+  if (!cameraShakeEnabled) return;
+
   cameraShake.intensity = intensity;
   cameraShake.duration = duration;
 }
@@ -369,6 +389,18 @@ function triggerScreenFlash() {
   setTimeout(() => flash.classList.remove('active'), 150);
 }
 
+function triggerAboutCinematic(npc) {
+  player.inputEnabled = false;
+  camera.lerpFactor = 0.02;
+
+  triggerCameraShake(4, 20);
+  triggerScreenFlash();
+
+  setTimeout(() => {
+    const basePath = window.siteBaseUrl || '';
+    window.location.href = basePath + '/about/';
+  }, 1200);
+}
 
 // function showOnboarding() {
 //   const onboarding = document.getElementById('onboarding');
@@ -436,6 +468,38 @@ function drawInteractiveObjects() {
 }
 
 function drawSword(sword) {
+  // Phase de disparition (fade + particules)
+  if (sword.removing) {
+    sword.fade -= 0.03;
+
+    // Particules de disparition
+    if (sword.fade < 0.6) {
+      ctx.save();
+      ctx.globalAlpha = sword.fade;
+
+      ctx.fillStyle = '#00ffff';
+      for (let i = 0; i < 12; i++) {
+        ctx.beginPath();
+        ctx.arc(
+          sword.x + sword.width / 2 + (Math.random()) * 40,
+          sword.y + sword.width / 2 + (Math.random()) * 40,
+          3,
+          0,
+          Math.PI * 2
+        );
+        ctx.fill();
+      }
+
+      ctx.restore();
+    }
+
+    if (sword.fade <= 0) {
+      interactiveObjects = interactiveObjects.filter(o => o !== sword);
+      return;
+    }
+  } 
+
+  // Disparition progressive après découverte
   if (sword.discovered && sword.alpha > 0) {
     sword.alpha -= 0.05;
     if (sword.alpha < 0) sword.alpha = 0;
@@ -448,11 +512,11 @@ function drawSword(sword) {
     // Effet de brillance qui pulse
     const pulse = Math.sin(Date.now() / 300) * 3;
     
-    // Ombre/aura brillante
+    // Aura brillante
     ctx.save();
-    ctx.globalAlpha = 0.4;
     ctx.shadowColor = '#00ffff';
     ctx.shadowBlur = 15 + pulse;
+    ctx.globalAlpha = sword.fade;
     ctx.drawImage(
       swordImage,
       sword.x - 5,
@@ -471,7 +535,7 @@ function drawSword(sword) {
       sword.height
     );
     
-    // Particules scintillantes autour de l'épée
+    // Particules scintillantes normales
     const time = Date.now() / 500;
     for (let i = 0; i < 3; i++) {
       const angle = time + (i * Math.PI * 2 / 3);
@@ -483,46 +547,55 @@ function drawSword(sword) {
       ctx.beginPath();
       ctx.arc(sparkleX, sparkleY, 2, 0, Math.PI * 2);
       ctx.fill();
-      ctx.globalAlpha = 1;
     }
+
   } else {
-    // Fallback si l'image n'est pas chargée
+    // Fallback si image non chargée
     const pulse = Math.sin(Date.now() / 300) * 5;
     
-    // Ombre
     ctx.fillStyle = 'rgba(255, 107, 107, 0.3)';
     ctx.beginPath();
     ctx.arc(sword.x + 15, sword.y + 40, 15 + pulse, 0, Math.PI * 2);
     ctx.fill();
     
-    // Lame
     ctx.fillStyle = '#c0c0c0';
     ctx.fillRect(sword.x + 12, sword.y, 6, 25);
     
-    // Garde
     ctx.fillStyle = '#ffd700';
     ctx.fillRect(sword.x + 5, sword.y + 25, 20, 5);
     
-    // Poignée
     ctx.fillStyle = '#8b4513';
     ctx.fillRect(sword.x + 10, sword.y + 30, 10, 10);
     
-    // Pommeau
     ctx.fillStyle = '#ffd700';
     ctx.beginPath();
     ctx.arc(sword.x + 15, sword.y + 43, 4, 0, Math.PI * 2);
     ctx.fill();
   }
-  ctx.globalAlpha = 1
+
+  ctx.globalAlpha = 1;
 }
 
 function drawNPC(npc) {
   const unlocked = projectsFound === totalProjects;
+  const progressRatio = projectsFound / totalProjects;
+  npc.glowIntensity = Math.min(progressRatio, 1);
 
-  if (unlocked) {
+  // GLOW PROGRESSIF
+  if (npc.glowIntensity > 0 && npcImage.complete) {
     ctx.save();
+    ctx.globalAlpha = npc.glowIntensity * 0.6;
     ctx.shadowColor = '#00ffff';
-    ctx.shadowBlur = 20 + Math.sin(Date.now() / 200) * 6;
+    ctx.shadowBlur = 20 + npc.glowIntensity * 30;
+
+    ctx.drawImage(
+      npcImage,
+      npc.x,
+      npc.y,
+      npc.width,
+      npc.height
+    );
+    ctx.restore();
   }
 
   if (npcImage.complete && npcImage.naturalHeight !== 0) {
@@ -532,9 +605,15 @@ function drawNPC(npc) {
     ctx.fillRect(npc.x + 10, npc.y + 30, 20, 30);
   }
 
-  if (unlocked) ctx.restore();
+  // GLOW FINAL quand tout est débloqué (pulse vivant)
+  if (unlocked) {
+    ctx.save();
+    ctx.shadowColor = '#00ffff';
+    ctx.shadowBlur = 25 + Math.sin(Date.now() / 200) * 8;
+    ctx.drawImage(npcImage, npc.x, npc.y, npc.width, npc.height);
+    ctx.restore();
+  }
 }
-
 
 function drawChest(chest) {
   // Base du coffre
@@ -742,10 +821,12 @@ function handleInteraction(obj) {
       // Marquer comme découvert et incrémenter
       if (!obj.discovered) {
         obj.discovered = true;
+        obj.removing = true;
         projectsFound++;
         updateProjectsUI();
 
         // Feedback immédiat
+        cameraShakeEnabled = true;
         triggerCameraShake(6, 12);
         triggerScreenFlash();
 
@@ -758,6 +839,7 @@ function handleInteraction(obj) {
       showProject(obj.projectId, obj.title);
       break;
     case 'npc':
+      cameraShakeEnabled = false;
       // PNJ Vérrouiller tant que les projets non pas été découverts
       if (projectsFound < totalProjects) {
         showLockedNpcMessage();
@@ -765,7 +847,8 @@ function handleInteraction(obj) {
       }
 
       const basePath = window.siteBaseUrl || '';
-      window.location.href = basePath + '/about/';
+      // window.location.href = basePath + '/about/';
+      triggerAboutCinematic(obj);
       break;
     case 'chest':
       openSocialLink(obj.link);
