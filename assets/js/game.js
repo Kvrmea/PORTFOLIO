@@ -18,6 +18,7 @@ let modalOpen = false;
 let projectsFound = 0;
 let totalProjects = 6;
 let lastInteractable = null;
+let npcUnlocked = false;
 
 // --- SYSTÈME DE CAMÉRA ---
 let camera = {
@@ -215,7 +216,8 @@ function createInteractiveObjects() {
       height: 70, 
       projectId: 1,
       title: 'Projet 1',
-      discovered: false 
+      discovered: false,
+      alpha: 1
     },
     { 
       type: 'sword', 
@@ -225,7 +227,8 @@ function createInteractiveObjects() {
       height: 70, 
       projectId: 2,
       title: 'Projet 2',
-      discovered: false 
+      discovered: false,
+      alpha: 1
     },
     { 
       type: 'sword', 
@@ -235,7 +238,8 @@ function createInteractiveObjects() {
       height: 70, 
       projectId: 3,
       title: 'Projet 3',
-      discovered: false 
+      discovered: false,
+      alpha: 1
     },
     { 
       type: 'sword', 
@@ -245,7 +249,8 @@ function createInteractiveObjects() {
       height: 70, 
       projectId: 4,
       title: 'Projet 4',
-      discovered: false 
+      discovered: false,
+      alpha: 1 
     },
     { 
       type: 'sword', 
@@ -255,7 +260,8 @@ function createInteractiveObjects() {
       height: 70, 
       projectId: 5,
       title: 'Projet 5',
-      discovered: false 
+      discovered: false,
+      alpha: 1 
     },
     { 
       type: 'sword', 
@@ -265,7 +271,8 @@ function createInteractiveObjects() {
       height: 70, 
       projectId: 6,
       title: 'Projet 6',
-      discovered: false 
+      discovered: false,
+      alpha: 1 
     },
     
     // PNJ pour "À propos"
@@ -399,6 +406,14 @@ function drawInteractiveObjects() {
 }
 
 function drawSword(sword) {
+  if (sword.discovered && sword.alpha > 0) {
+    sword.alpha -= 0.05;
+    if (sword.alpha < 0) sword.alpha = 0;
+  }
+  if (sword.alpha === 0) return;
+
+  ctx.globalAlpha = sword.alpha;
+
   if (swordImage.complete && swordImage.naturalHeight !== 0) {
     // Effet de brillance qui pulse
     const pulse = Math.sin(Date.now() / 300) * 3;
@@ -468,46 +483,28 @@ function drawSword(sword) {
     ctx.arc(sword.x + 15, sword.y + 43, 4, 0, Math.PI * 2);
     ctx.fill();
   }
+  ctx.globalAlpha = 1
 }
 
 function drawNPC(npc) {
+  const unlocked = projectsFound === totalProjects;
+
+  if (unlocked) {
+    ctx.save();
+    ctx.shadowColor = '#00ffff';
+    ctx.shadowBlur = 20 + Math.sin(Date.now() / 200) * 6;
+  }
+
   if (npcImage.complete && npcImage.naturalHeight !== 0) {
-    // Dessiner l'image du PNJ
-    ctx.drawImage(
-      npcImage,
-      npc.x,
-      npc.y,
-      npc.width,
-      npc.height
-    );
+    ctx.drawImage(npcImage, npc.x, npc.y, npc.width, npc.height);
   } else {
-    // Fallback si l'image n'est pas chargée
-    // Corps
     ctx.fillStyle = '#4a5568';
     ctx.fillRect(npc.x + 10, npc.y + 30, 20, 30);
-    
-    // Tête
-    ctx.fillStyle = '#fdbcb4';
-    ctx.beginPath();
-    ctx.arc(npc.x + 20, npc.y + 20, 12, 0, Math.PI * 2);
-    ctx.fill();
-    
-    // Yeux
-    ctx.fillStyle = '#000';
-    ctx.fillRect(npc.x + 15, npc.y + 18, 3, 3);
-    ctx.fillRect(npc.x + 22, npc.y + 18, 3, 3);
-    
-    // Cape
-    ctx.fillStyle = '#ed64a6';
-    ctx.beginPath();
-    ctx.moveTo(npc.x + 5, npc.y + 30);
-    ctx.lineTo(npc.x + 35, npc.y + 30);
-    ctx.lineTo(npc.x + 30, npc.y + 55);
-    ctx.lineTo(npc.x + 10, npc.y + 55);
-    ctx.closePath();
-    ctx.fill();
   }
+
+  if (unlocked) ctx.restore();
 }
+
 
 function drawChest(chest) {
   // Base du coffre
@@ -583,6 +580,7 @@ function checkInteractions() {
   let nearestOther = null;
 
   for (const obj of interactiveObjects) {
+    if (obj.type === 'sword' && obj.discovered) continue;
     const distance = Math.hypot(
       (player.x + player.width / 2) - (obj.x + obj.width / 2),
       (player.y + player.height / 2) - (obj.y + obj.height / 2)
@@ -685,6 +683,29 @@ document.getElementById('close-modal')?.addEventListener('click', closeProjectMo
 //   uiOverlay.appendChild(hint);
 // }
 
+function triggerUnlockAnimation() {
+  const overlay = document.getElementById('ui-overlay');
+
+  // FLASH
+  const flash = document.createElement('div');
+  flash.style.position = 'fixed';
+  flash.style.inset = '0';
+  flash.style.background = 'white';
+  flash.style.opacity = '0.8';
+  flash.style.zIndex = '9999';
+  overlay.appendChild(flash);
+
+  setTimeout(() => flash.remove(), 120);
+
+  // ZOOM caméra
+  camera.lerpFactor = 0.15;
+
+  setTimeout(() => {
+    camera.lerpFactor = 0.05;
+  }, 600);
+}
+
+
 function handleInteraction(obj) {
   switch(obj.type) {
     case 'sword':
@@ -693,6 +714,10 @@ function handleInteraction(obj) {
         obj.discovered = true;
         projectsFound++;
         updateProjectsUI();
+        
+        if (projectsFound === totalProjects) {
+          triggerUnlockAnimation();
+        }
       }
       showProject(obj.projectId, obj.title);
       break;
@@ -759,29 +784,29 @@ function showProject(projectId, title) {
         "3d three.js",
         "fetch API",
       ],
-      link: "#"
+      link: "https://kvrmea.github.io/systeme-solaire-en-3D/"
     },
     5: {
-      title: "Projet 5 - Site E-commerce",
-      description: "Plateforme e-commerce complète avec panier et paiement.",
-      technologies: ["Vue.js", "Stripe", "PostgreSQL"],
+      title: "Projet 5 - Calculator",
+      description: "calculatrice scientifique sur web.",
+      technologies: ["node.js", "JavaScript", "css"],
       features: [
-        "Gestion de panier",
-        "Paiement sécurisé",
-        "Dashboard admin"
+        "Interface",
+        "calcul",
+        "deux mode"
       ],
-      link: "#"
+      link: "https://kvrmea.github.io/calculator-graphic/"
     },
     6: {
-      title: "Projet 6 - IA & Machine Learning",
-      description: "Projet utilisant le machine learning pour la reconnaissance d'images.",
-      technologies: ["Python", "TensorFlow", "OpenCV"],
+      title: "Projet 6 - Guess my number",
+      description: "Projet à base d'un jeu pour trouver des nombres.",
+      technologies: ["JavaScript", "HTML", "CSS"],
       features: [
-        "Reconnaissance d'objets",
-        "Apprentissage automatique",
-        "API de prédiction"
+        "Script",
+        "Utilisation du jeu",
+        "Joueur vs machine"
       ],
-      link: "#"
+      link: "https://kvrmea.github.io/Guess-a-number/"
     }
   };
   
