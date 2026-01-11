@@ -75,6 +75,8 @@ body_class: game-page
   </div>
 </div>
 
+<div id="screen-flash"></div>
+
 <script>
   window.siteBaseUrl = "{{ site.baseurl }}";
 </script>

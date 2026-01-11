@@ -20,6 +20,12 @@ let totalProjects = 6;
 let lastInteractable = null;
 let npcUnlocked = false;
 
+// Shake caméra
+let cameraShake = {
+  duration: 0,
+  intensity: 0
+};
+
 // --- SYSTÈME DE CAMÉRA ---
 let camera = {
   x: 0,
@@ -328,7 +334,17 @@ function gameLoop(timestamp) {
   // 3. Rendu
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.save();
-  ctx.translate(-camera.x, 0);
+  // ctx.translate(-camera.x, 0);
+  let shakeX = 0;
+  let shakeY = 0;
+
+  if (cameraShake.duration > 0) {
+  shakeX = (Math.random() - 0.5) * cameraShake.intensity;
+  shakeY = (Math.random() - 0.5) * cameraShake.intensity;
+  cameraShake.duration--;
+  } 
+
+  ctx.translate(-camera.x + shakeX, shakeY);
   
   player.update(deltaTime, platforms);
   drawPlatforms();
@@ -339,6 +355,20 @@ function gameLoop(timestamp) {
   checkInteractions();
   requestAnimationFrame(gameLoop);
 }
+
+function triggerCameraShake(intensity = 8, duration = 15) {
+  cameraShake.intensity = intensity;
+  cameraShake.duration = duration;
+}
+
+function triggerScreenFlash() {
+  const flash = document.getElementById('screen-flash');
+  if (!flash) return;
+
+  flash.classList.add('active');
+  setTimeout(() => flash.classList.remove('active'), 150);
+}
+
 
 // function showOnboarding() {
 //   const onboarding = document.getElementById('onboarding');
@@ -714,11 +744,17 @@ function handleInteraction(obj) {
         obj.discovered = true;
         projectsFound++;
         updateProjectsUI();
-        
+
+        // Feedback immédiat
+        triggerCameraShake(6, 12);
+        triggerScreenFlash();
+
+        // Déblocage final
         if (projectsFound === totalProjects) {
           triggerUnlockAnimation();
         }
       }
+
       showProject(obj.projectId, obj.title);
       break;
     case 'npc':
@@ -871,4 +907,12 @@ function updateProjectsUI() {
   countEl.textContent = projectsFound;
   const percent = (projectsFound / totalProjects) * 100;
   fillEl.style.width = percent + "%";
+
+  if (projectsFound === totalProjects && !npcUnlocked) {
+  npcUnlocked = true;
+
+  triggerCameraShake(12, 25);
+  triggerScreenFlash();
+  }
+
 }
